@@ -86,6 +86,9 @@ func (cfg *TxnKvConfig) ParseBackupConfigFromFlags(flags *pflag.FlagSet) error {
 	}
 	cfg.CompressionLevel = level
 
+	cfg.StartVersion, _ = flags.GetInt64(flagStartVersion)
+	log.Warn("backup txn start-version ", zap.Int64("start-version", cfg.StartVersion))
+
 	return nil
 }
 
@@ -189,7 +192,7 @@ func RunBackupTxn(c context.Context, g glue.Glue, cmdName string, cfg *TxnKvConf
 
 	req := backuppb.BackupRequest{
 		ClusterId:        client.GetClusterID(),
-		StartVersion:     0,
+		StartVersion:     uint64(cfg.StartVersion),
 		EndVersion:       backupTS,
 		RateLimit:        cfg.RateLimit,
 		Concurrency:      cfg.Concurrency,
