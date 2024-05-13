@@ -205,7 +205,7 @@ func RunBackupTxn(c context.Context, g glue.Glue, cmdName string, cfg *TxnKvConf
 		CipherInfo:       &cfg.CipherInfo,
 	}
 
-	log.Info("backup req start-version", zap.Int64("start-version", cfg.StartVersion))
+	log.Info("backup req start-version", zap.Uint64("start-version", req.StartVersion))
 
 	metaWriter := metautil.NewMetaWriter(client.GetStorage(), metautil.MetaFileSize, false, metautil.MetaFile, &cfg.CipherInfo)
 	metaWriter.StartWriteMetasAsync(ctx, metautil.AppendDataFile)
