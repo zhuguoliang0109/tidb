@@ -85,6 +85,8 @@ func (cfg *TxnKvConfig) ParseBackupConfigFromFlags(flags *pflag.FlagSet) error {
 		return errors.Trace(err)
 	}
 	cfg.CompressionLevel = level
+	cfg.StartVersion, _ = flags.GetInt64(flagStartVersion)
+	log.Warn("backup txn start-version ", zap.Int64("start-version", cfg.StartVersion))
 
 	return nil
 }
@@ -191,7 +193,7 @@ func RunBackupTxn(c context.Context, g glue.Glue, cmdName string, cfg *TxnKvConf
 
 	req := backuppb.BackupRequest{
 		ClusterId:        client.GetClusterID(),
-		StartVersion:     0,
+		StartVersion:     uint64(cfg.StartVersion),
 		EndVersion:       backupTS,
 		RateLimit:        cfg.RateLimit,
 		Concurrency:      cfg.Concurrency,
@@ -201,6 +203,7 @@ func RunBackupTxn(c context.Context, g glue.Glue, cmdName string, cfg *TxnKvConf
 		CompressionLevel: cfg.CompressionLevel,
 		CipherInfo:       &cfg.CipherInfo,
 	}
+	log.Info("backup req start-version", zap.Uint64("start-version", req.StartVersion))
 
 	metaWriter := metautil.NewMetaWriter(client.GetStorage(), metautil.MetaFileSize, false, metautil.MetaFile, &cfg.CipherInfo)
 	metaWriter.StartWriteMetasAsync(ctx, metautil.AppendDataFile)
