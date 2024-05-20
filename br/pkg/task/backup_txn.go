@@ -172,7 +172,6 @@ func RunBackupTxn(c context.Context, g glue.Glue, cmdName string, cfg *TxnKvConf
 	if err != nil {
 		return errors.Trace(err)
 	}
-	regionCounts := []int{approximateRegions}
 
 	summary.CollectInt("backup total regions", approximateRegions)
 
@@ -207,7 +206,7 @@ func RunBackupTxn(c context.Context, g glue.Glue, cmdName string, cfg *TxnKvConf
 
 	metaWriter := metautil.NewMetaWriter(client.GetStorage(), metautil.MetaFileSize, false, metautil.MetaFile, &cfg.CipherInfo)
 	metaWriter.StartWriteMetasAsync(ctx, metautil.AppendDataFile)
-	err = client.BackupRanges(ctx, backupRanges, regionCounts, req, 1, nil, metaWriter, progressCallBack)
+	err = client.BackupRanges(ctx, backupRanges, req, 1, nil, metaWriter, progressCallBack)
 	if err != nil {
 		return errors.Trace(err)
 	}
